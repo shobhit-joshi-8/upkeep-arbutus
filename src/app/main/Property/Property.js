@@ -1,5 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
-import { createProperty, getPosts } from "app/store/propertySlice";
+import {
+  createProperty,
+  getPosts,
+  updateProperty,
+} from "app/store/propertySlice";
 import { styled } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import FusePageSimple from "@fuse/core/FusePageSimple";
@@ -45,6 +49,7 @@ function ExamplePage(props) {
   const [open, setOpen] = useState(false);
   const [selectedPropertyId, setSelectedPropertyId] = useState(null);
   const [editData, setEditData] = useState(null);
+  const [updatepropertyId, setUpdatePropertyId] = useState(null);
 
   const handleClickOpen = (propertyId) => {
     setOpen(true);
@@ -52,18 +57,18 @@ function ExamplePage(props) {
   };
   const handleClickOpencreate = (data = null) => {
     if (data) {
-    
-        setEditData(data);
-        console.log(data)
-        console.log(editData);
-      } else {
-        setEditData(null);
-      }
-      setAddDialog(true);
+      setEditData(data);
+      console.log(data);
+      console.log(editData);
+    } else {
+      setEditData(null);
+    }
+    setAddDialog(true);
+    setUpdatePropertyId(data._id);
   };
   const handleClose = () => {
     setAddDialog(false);
-    // setEditData(null);
+    setEditData(null);
   };
   const onDelete = () => {
     handleDelete(selectedPropertyId);
@@ -98,6 +103,15 @@ function ExamplePage(props) {
       console.error("Error creating property:", error);
     }
   };
+  const handleUpdate =  (editData) => {
+    const token =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWU2YzdmZWE0Nzc0Zjg2YmVmNjYxMzUiLCJyb2xlIjoiTGFuZGxvcmQiLCJpYXQiOjE3MDk3MDQ1MDF9.E2lhD_3FnZP-G4j97Aq-_sVpXBfx4PQKf2LuyvuLgAk"; // Replace with your actual token
+    // console.log("Request Payload:", propertyData)
+      dispatch(updateProperty({ token, editData, updatepropertyId}));
+      // After successful creation, refresh the property list
+      dispatch(getPosts(token));
+      setAddDialog(false);
+  };
 
   const validationSchema = Yup.object().shape({
     property_name: Yup.string()
@@ -119,7 +133,7 @@ function ExamplePage(props) {
     description: Yup.string().required("*Description is required"),
     state: Yup.string().required("*State is required"),
   });
-  
+
   return (
     <Root
       header={
@@ -232,7 +246,7 @@ function ExamplePage(props) {
             <Dialog open={addDialog} onClose={handleClose}>
               <Formik
                 initialValues={{
-                //   property_id: editData ? editData.property_id : "",
+                  //   property_id: editData ? editData.property_id : "",
                   property_name: editData ? editData.propertyname : "",
                   total_rooms: editData ? editData.totalroom : "",
                   price: editData ? editData.price : "",
@@ -245,7 +259,7 @@ function ExamplePage(props) {
                   state: editData ? editData.state : "",
                 }}
                 validationSchema={validationSchema}
-                onSubmit={(values, { setSubmitting }) => {
+                onSubmit={async (values, { setSubmitting }) => {
                   // You can modify the structure of values if needed before sending
 
                   const propertyData = {
@@ -260,19 +274,25 @@ function ExamplePage(props) {
                     description: values.description,
                     state: values.state,
                   };
-                  handleCreate(propertyData);
-                  setSubmitting(false);
+                  if (editData) {
+                    // await dispatch(updateUser({ ...editData, ...values }));
+                    handleUpdate(propertyData);
+                  } else {
+                    handleCreate(propertyData);
+                    setSubmitting(false);
+                  }
                 }}
               >
                 {({ isSubmitting }) => (
                   <Form>
                     <DialogTitle>
                       {/* create property */}
-                       {editData ? "Update User" : "Create Property"}
+                      {editData ? "Update User" : "Create Property"}
                     </DialogTitle>
                     <DialogContent>
                       <DialogContentText>
-                      To {editData ? "Update" : "Create"} user, please enter details
+                        To {editData ? "Update" : "Create"} user, please enter
+                        details
                       </DialogContentText>
                       {/* <Field
                                                 autoFocus
@@ -286,7 +306,7 @@ function ExamplePage(props) {
                                             /> */}
                       {/* <ErrorMessage name="name" /> */}
                       <Field
-                    //   autoFocus
+                        //   autoFocus
                         margin="dense"
                         id="name"
                         name="property_name"
@@ -295,7 +315,7 @@ function ExamplePage(props) {
                         fullWidth
                         as={TextField}
                       />
-                       <ErrorMessage name="property_name" />
+                      <ErrorMessage name="property_name" />
                       <Field
                         // autoFocus
                         margin="dense"
@@ -308,7 +328,7 @@ function ExamplePage(props) {
                       />
                       <ErrorMessage name="total_rooms" />
                       <Field
-                    //   autoFocus
+                        //   autoFocus
                         margin="dense"
                         id="price"
                         name="price"
@@ -330,7 +350,7 @@ function ExamplePage(props) {
                       />
                       <ErrorMessage name="property_capacity" />
                       <Field
-                    //   autoFocus
+                        //   autoFocus
                         margin="dense"
                         id="address1"
                         name="address1"
@@ -395,8 +415,7 @@ function ExamplePage(props) {
                     <DialogActions>
                       <Button onClick={handleClose}>Cancel</Button>
                       <Button type="submit" disabled={isSubmitting}>
-                      {editData ? "Update" : "Create"}
-                        create
+                        {editData ? "Update" : "Create"}
                       </Button>
                     </DialogActions>
                   </Form>

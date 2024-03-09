@@ -13,6 +13,7 @@ export const getPosts = createAsyncThunk(
   }
 );
 
+
 export const deleteProperty = createAsyncThunk(
   "posts/deleteProperty",
   async ({ token, propertyId }) => {
@@ -42,6 +43,29 @@ export const createProperty = createAsyncThunk(
 
     const response = await fetch("https://reileadsapi.exerboost.in/upkeep/app/landlord/create/property", {
       method: 'POST',
+      headers: {
+        Authorization: ` ${token}`
+      },
+      body: formData
+    });
+    const data = await response.json();
+    return data; // You can handle the response as needed
+  }
+);
+//update
+export const updateProperty = createAsyncThunk(
+  "posts/updateProperty",
+  async ({ token, editData, updatepropertyId}) => {
+    // console.log(propertyData)
+
+    const formData = new FormData();
+
+    // Append form data fields to the FormData object
+    Object.keys(editData).forEach(key => {
+      formData.append(key, editData[key]);
+    });
+    const response = await fetch(`https://reileadsapi.exerboost.in/upkeep/app/landlord/update/property/${updatepropertyId}`, {
+      method: 'PATCH',
       headers: {
         Authorization: ` ${token}`
       },
@@ -88,6 +112,17 @@ const propertySlice = createSlice({
       // You can handle the response if needed
     },
     [createProperty.rejected]: (state) => {
+      state.loading = false;
+      // Handle the rejection if needed
+    },
+    [updateProperty.pending]: (state) => {
+      state.loading = true;
+    },
+    [updateProperty.fulfilled]: (state, action) => {
+      state.loading = false;
+      // You can handle the response if needed
+    },
+    [updateProperty.rejected]: (state) => {
       state.loading = false;
       // Handle the rejection if needed
     },
