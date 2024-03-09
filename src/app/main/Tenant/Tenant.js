@@ -49,7 +49,7 @@ function ExamplePage(props) {
         <Root
             header={
                 <div className="p-24" style={{  paddingBottom: '10px'}}>
-                    <h1 style={{  fontWeight: '900'}}>TENANT</h1>
+                    <h1 style={{  fontWeight: '900'}}>Tenant</h1>
                 </div>
             }
             content={
