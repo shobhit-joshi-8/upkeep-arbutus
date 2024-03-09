@@ -104,11 +104,11 @@ function ExamplePage(props) {
       .integer("*Property Capacity must be an integer")
       .required("*Property Capacity is required"),
     address1: Yup.string().required("*Address1 is required"),
-    address2: Yup.string(),
+    address2: Yup.string().required("*Address2 is required"),
     city: Yup.string().required("*City is required"),
-    postcode: Yup.string(),
-    description: Yup.string(),
-    state: Yup.string(),
+    postcode: Yup.string().required("*Postcode is required"),
+    description: Yup.string().required("*Description is required"),
+    state: Yup.string().required("*State is required"),
   });
   
   return (
