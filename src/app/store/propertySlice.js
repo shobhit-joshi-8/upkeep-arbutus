@@ -73,6 +73,7 @@ export const updateProperty = createAsyncThunk(
     });
     const data = await response.json();
     return data; // You can handle the response as needed
+    //comment
   }
 );
 
