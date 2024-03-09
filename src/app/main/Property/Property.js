@@ -44,13 +44,22 @@ function ExamplePage(props) {
   const [addDialog, setAddDialog] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedPropertyId, setSelectedPropertyId] = useState(null);
+  const [editData, setEditData] = useState(null);
 
   const handleClickOpen = (propertyId) => {
     setOpen(true);
     setSelectedPropertyId(propertyId);
   };
-  const handleClickOpencreate = () => {
-    setAddDialog(true);
+  const handleClickOpencreate = (data = null) => {
+    if (data) {
+    
+        setEditData(data);
+        console.log(data)
+        console.log(editData);
+      } else {
+        setEditData(null);
+      }
+      setAddDialog(true);
   };
   const handleClose = () => {
     setAddDialog(false);
@@ -186,6 +195,7 @@ function ExamplePage(props) {
                             backgroundColor: "#51AB30",
                             marginRight: "8px",
                           }}
+                          onClick={() => handleClickOpencreate(item)}
                         >
                           EDIT
                         </Button>
@@ -222,14 +232,17 @@ function ExamplePage(props) {
             <Dialog open={addDialog} onClose={handleClose}>
               <Formik
                 initialValues={{
-                  property_id: "",
-                  property_name: "",
-                  total_rooms: "",
-                  price: "",
-                  property_capacity: "",
-                  address1: "",
-                  address2: "",
-                  city: "",
+                //   property_id: editData ? editData.property_id : "",
+                  property_name: editData ? editData.propertyname : "",
+                  total_rooms: editData ? editData.totalroom : "",
+                  price: editData ? editData.price : "",
+                  property_capacity: editData ? editData.propertycapacity : "",
+                  address1: editData ? editData.address1 : "",
+                  address2: editData ? editData.address2 : "",
+                  postcode: editData ? editData.postcode : "",
+                  description: editData ? editData.description : "",
+                  city: editData ? editData.city : "",
+                  state: editData ? editData.state : "",
                 }}
                 validationSchema={validationSchema}
                 onSubmit={(values, { setSubmitting }) => {
@@ -254,13 +267,12 @@ function ExamplePage(props) {
                 {({ isSubmitting }) => (
                   <Form>
                     <DialogTitle>
-                      create property
-                      {/* { {editData ? "Update User" : "Create User"} /} /} */}
+                      {/* create property */}
+                       {editData ? "Update User" : "Create Property"}
                     </DialogTitle>
                     <DialogContent>
                       <DialogContentText>
-                        {/* To {editData ? "update" : "create"} user, please enter
-                  name and email address here. */}
+                      To {editData ? "Update" : "Create"} user, please enter details
                       </DialogContentText>
                       {/* <Field
                                                 autoFocus
@@ -383,7 +395,7 @@ function ExamplePage(props) {
                     <DialogActions>
                       <Button onClick={handleClose}>Cancel</Button>
                       <Button type="submit" disabled={isSubmitting}>
-                        {/* {/ {/ {editData ? "Update" : "Create"} /} create /} */}
+                      {editData ? "Update" : "Create"}
                         create
                       </Button>
                     </DialogActions>
